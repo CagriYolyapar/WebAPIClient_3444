@@ -42,6 +42,9 @@
                         <th>Kategori ID</th>
                         <th>Kategori ismi</th>
                         <th>Acıklaması</th>
+                        <th>Guncelle</th>
+                        <th>Sil</th>
+                        <th>Sec</th>
 
                     </tr>
                 </table>
@@ -68,18 +71,130 @@
 
         function BringDataList(dataList) {
             //JavaScript'te her eylem bir fonksiyondur...Anlık eylemler ise Anonymus Function'lar olarak acılır...
+            ControlHeader();
+            $.each(dataList, function (key,data) {
 
-            $.each(dataList, function (key, data) {
-                $("#tab1").append("<tr> </tr>")
+                $("#tab1").append("<tr> <td> " + data.Id + "  </td> <td> " + data.CategoryName + " </td> <td>" + data.Description + " </td> <td> <button data-id='"+data.Id+"' class='btn btn-warning' value='update'> Güncelle </button> </td> <td> <button data-id='"+data.Id+"'  class='btn btn-danger' value='delete'>Sil </button> </td> <td> <button data-id='"+data.Id+"' class='btn btn-primary' value='select'> Sec </button> </td>     </tr>");
+
             })
+           
         }
+
+        //Bu fonksiyonumuz API'ya gidip tekil veri aldıgımız zaman (GetById seklinde) elimize gecen o veriyi buradaki tablomuzun body'sine entegre etmekle görevli
+
+        function BringData(data) {
+            ControlHeader();
+
+            $("#tab1").append("<tr> <td> " + data.Id + "  </td> <td> " + data.CategoryName + " </td> <td>" + data.Description + " </td> <td> <button data-id='" + data.Id + "' class='btn btn-warning' value='update'> Güncelle </button> </td> <td> <button data-id='" + data.Id + "'  class='btn btn-danger' value='delete'>Sil </button> </td> <td> <button data-id='" + data.Id + "' class='btn btn-primary' value='select'> Sec </button> </td>     </tr>");
+        }
+
+
+        //API Requests...
+
+        $(function () {
+
+
+
+            //Kategorileri Listelemek
+
+
+            $("#btnAll").click(function () {
+
+                $.ajax({
+                    url: "http://localhost:64273/api/Category/GetCategories",
+                    type: "Get",
+                    success: function (kategoriler) {
+                        BringDataList(kategoriler);
+                    }
+
+                })
+
+            })    
+
+            //Kategori Getir
+
+            $("#btnId").click(function () {
+                $.ajax({
+                    url: "http://localhost:64273/api/Category/GetCategory", //Burada dilerseniz data parametresinde Json verisi göndermek yerine URL'e direkt /+$("#txtId").val() ifadesi eklenebilir. Ama eger böyle yapacaksanız GetCategory'den sonra slash koymayı unutmayın...Ve bir de bu ancak gitmek istediginiz ACtion parametresinin ismi RouteMap'inizdeki isimle uyusuyorsa gecerlidir...
+                    data: {id : $("#txtId").val()},
+                    type: "Get",
+                    success: function (kategori) {
+                        BringData(kategori);
+                    }
+                })
+            }) 
+
+
+            //Kategori Ekle
+
+            $("#btnAdd").click(function () {
+
+                $.ajax({
+                    url: "http://localhost:64273/api/Category/AddCategory",
+                    type: "Post",
+                    data: { CategoryName: $("#txtName").val(), Description: $("#txtDesc").val() },
+                    success: function (kategoriler) {
+                        BringDataList(kategoriler);
+                    }
+
+                })
+
+            })
+
+            //Kategori Güncelleme
+
+            $("#btnUpdate").click(function () {
+                $.ajax({
+                    url: "http://localhost:64273/api/Category/UpdateCategory",
+                    type: "Put",
+                    data: { Id: $("#txtId").val(), CategoryName: $("#txtName").val(), Description: $("#txtDesc").val() },
+                    success: function (kategoriler) {
+                        BringDataList(kategoriler);
+                    }
+                })
+            }) 
+
+
+
+            //QueryString sizin özel parametre ismi vererek onun degerini url'e entegre etmenizdir...
+
+
+            //Kategori Sil
+            $("#btnDelete").click(function () {
+                $.ajax({
+                    url: "http://localhost:64273/api/Category/DeleteCategory?kimlik="+$("#txtId").val(),
+                    type: "Delete",
+                    success: function (kategoriler) {
+                        BringDataList(kategoriler);
+                    }
+                    
+                })
+            })
+
+
+
+
+
+          
+
+
+
+
+
+
+
+
+        })
+
+
 
 
 
 
     </script>
 
-
+   
 
 </body>
+
 </html>
