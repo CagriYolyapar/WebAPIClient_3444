@@ -33,6 +33,13 @@
 
                 <input type="button" id="btnDelete" class="btn btn-danger" value="Kategori Sil" />
 
+                <br />  <br />
+
+                Arama motoru : 
+                <br />
+
+                <input type="text" class="form-control"  id="txtSearch" />
+
 
             </div>
 
@@ -86,6 +93,13 @@
             ControlHeader();
 
             $("#tab1").append("<tr> <td> " + data.Id + "  </td> <td> " + data.CategoryName + " </td> <td>" + data.Description + " </td> <td> <button data-id='" + data.Id + "' class='btn btn-warning' value='update'> Güncelle </button> </td> <td> <button data-id='" + data.Id + "'  class='btn btn-danger' value='delete'>Sil </button> </td> <td> <button data-id='" + data.Id + "' class='btn btn-primary' value='select'> Sec </button> </td>     </tr>");
+        }
+
+
+        function FetchData(data) {
+            $("#txtId").val(data.Id);
+            $("#txtName").val(data.CategoryName);
+            $("#txtDesc").val(data.Description);
         }
 
 
@@ -169,6 +183,84 @@
                     }
                     
                 })
+            })
+
+
+            //Kategori Ara
+
+            $("#txtSearch").keyup(function () {
+
+                $.ajax({
+                    url: "http://localhost:64273/api/Category/SearchCategory",
+                    type: "Get",
+                    data: { item: $(this).val() },
+                    success: function (kategoriler) {
+                        BringDataList(kategoriler);
+                    }
+                })
+
+
+            })
+
+
+            //JAvaScript Event Handling - Jquery'de on metodu  runtime'da olusacak eventlerin ifadesini entegre etmek icin kullanılır...
+
+
+            //Update
+
+            $("#tab1").on("click", "[value=update]", function () {
+
+                $.ajax({
+                    url: "http://localhost:64273/api/Category/UpdateCategory",
+                    type: "Put",
+                    data: { Id: $(this).attr("data-id"), CategoryName: $("#txtName").val(), Description: $("#txtDesc").val() },
+                    success: function (kategoriler) {
+                        BringDataList(kategoriler);
+                    }
+                })
+
+
+
+            })
+
+            // Delete
+
+            $("#tab1").on("click", "[value=delete]", function () {
+
+               
+
+                $.ajax({
+                    url: "http://localhost:64273/api/Category/DeleteCategory?kimlik=" + $(this).attr("data-id"),
+                    type: "Delete",
+                    success: function (kategoriler) {
+                        BringDataList(kategoriler);
+                    }
+
+                })
+
+
+
+            })
+
+
+            //Select
+
+            $("#tab1").on("click", "[value=select]", function () {
+
+                $.ajax({
+
+                    url: "http://localhost:64273/api/Category/GetCategory",
+                    data: { id:$(this).attr("data-id") },
+                    type: "Get",
+                    success: function (kategori) {
+                        FetchData(kategori);
+                    }
+
+
+
+                })
+
+
             })
 
 
